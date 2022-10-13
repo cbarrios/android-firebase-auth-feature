@@ -13,12 +13,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseUser
 import com.lalosapps.firebaseauth.ui.theme.spacing
 import com.lalosapps.firebaseauth.R
 import com.lalosapps.firebaseauth.ui.theme.AppTheme
 
 @Composable
 fun HomeScreen(
+    currentUser: FirebaseUser?,
     onLogoutClick: () -> Unit
 ) {
     val spacing = MaterialTheme.spacing
@@ -38,7 +40,7 @@ fun HomeScreen(
         )
 
         Text(
-            text = stringResource(id = R.string.name),
+            text = currentUser?.displayName ?: stringResource(id = R.string.name),
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -68,7 +70,7 @@ fun HomeScreen(
                 )
 
                 Text(
-                    text = "Belal Khan",
+                    text = currentUser?.displayName ?: stringResource(id = R.string.name),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.weight(0.7f),
                     color = MaterialTheme.colorScheme.onSurface
@@ -88,7 +90,7 @@ fun HomeScreen(
                 )
 
                 Text(
-                    text = "probelalkhan@gmail.com",
+                    text = currentUser?.email ?: stringResource(id = R.string.email),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.weight(0.7f),
                     color = MaterialTheme.colorScheme.onSurface
@@ -111,7 +113,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreviewLight() {
     AppTheme {
-        HomeScreen {}
+        HomeScreen(null) {}
     }
 }
 
@@ -119,6 +121,6 @@ fun HomeScreenPreviewLight() {
 @Composable
 fun HomeScreenPreviewDark() {
     AppTheme {
-        HomeScreen {}
+        HomeScreen(null) {}
     }
 }

@@ -53,7 +53,15 @@ fun AppNavHost(
             )
         }
         composable(ROUTE_HOME) {
-            HomeScreen(onLogoutClick = viewModel::logout)
+            HomeScreen(
+                currentUser = viewModel.currentUser,
+                onLogoutClick = {
+                    viewModel.logout()
+                    navController.navigate(ROUTE_LOGIN) {
+                        popUpTo(ROUTE_HOME) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

@@ -33,8 +33,8 @@ class AuthViewModel @Inject constructor(
 
     init {
         if (currentUser != null) {
-            signedIn = true
             _loginFlow.value = Resource.Success(currentUser!!)
+            signedIn = true
         } else {
             signedIn = false
         }
@@ -60,5 +60,6 @@ class AuthViewModel @Inject constructor(
         repository.logoutUser()
         _loginFlow.value = null
         _signupFlow.value = null
+        signedIn = false
     }
 }
