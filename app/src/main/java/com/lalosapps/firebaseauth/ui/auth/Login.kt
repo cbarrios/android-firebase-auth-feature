@@ -18,18 +18,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.lalosapps.firebaseauth.R
-import com.lalosapps.firebaseauth.navigation.ROUTE_LOGIN
-import com.lalosapps.firebaseauth.navigation.ROUTE_SIGNUP
 import com.lalosapps.firebaseauth.ui.theme.AppTheme
 import com.lalosapps.firebaseauth.ui.theme.spacing
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    onLoginClick: () -> Unit,
+    onNavigate: () -> Unit,
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -99,9 +97,7 @@ fun LoginScreen(navController: NavController) {
         )
 
         Button(
-            onClick = {
-
-            },
+            onClick = onLoginClick,
             modifier = Modifier.constrainAs(refButtonLogin) {
                 top.linkTo(refPassword.bottom, spacing.large)
                 start.linkTo(parent.start, spacing.extraLarge)
@@ -109,7 +105,10 @@ fun LoginScreen(navController: NavController) {
                 width = Dimension.fillToConstraints
             }
         ) {
-            Text(text = stringResource(id = R.string.login), style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = stringResource(id = R.string.login),
+                style = MaterialTheme.typography.titleMedium
+            )
         }
 
         Text(
@@ -120,9 +119,7 @@ fun LoginScreen(navController: NavController) {
                     end.linkTo(parent.end, spacing.extraLarge)
                 }
                 .clickable {
-                    navController.navigate(ROUTE_SIGNUP) {
-                        popUpTo(ROUTE_LOGIN) { inclusive = true }
-                    }
+                    onNavigate()
                 },
             text = stringResource(id = R.string.dont_have_account),
             style = MaterialTheme.typography.bodyLarge,
@@ -137,7 +134,7 @@ fun LoginScreen(navController: NavController) {
 @Composable
 fun LoginScreenPreviewLight() {
     AppTheme {
-        LoginScreen(rememberNavController())
+        LoginScreen({}, {})
     }
 }
 
@@ -145,6 +142,6 @@ fun LoginScreenPreviewLight() {
 @Composable
 fun LoginScreenPreviewDark() {
     AppTheme {
-        LoginScreen(rememberNavController())
+        LoginScreen({}, {})
     }
 }

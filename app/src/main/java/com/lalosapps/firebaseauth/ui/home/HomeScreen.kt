@@ -13,14 +13,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.lalosapps.firebaseauth.ui.theme.spacing
 import com.lalosapps.firebaseauth.R
 import com.lalosapps.firebaseauth.ui.theme.AppTheme
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(
+    onLogoutClick: () -> Unit
+) {
     val spacing = MaterialTheme.spacing
     Column(
         modifier = Modifier
@@ -96,7 +96,7 @@ fun HomeScreen(navController: NavHostController) {
             }
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = onLogoutClick,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = spacing.extraLarge)
@@ -111,7 +111,7 @@ fun HomeScreen(navController: NavHostController) {
 @Composable
 fun HomeScreenPreviewLight() {
     AppTheme {
-        HomeScreen(rememberNavController())
+        HomeScreen {}
     }
 }
 
@@ -119,6 +119,6 @@ fun HomeScreenPreviewLight() {
 @Composable
 fun HomeScreenPreviewDark() {
     AppTheme {
-        HomeScreen(rememberNavController())
+        HomeScreen {}
     }
 }

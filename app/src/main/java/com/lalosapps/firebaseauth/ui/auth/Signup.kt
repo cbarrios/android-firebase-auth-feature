@@ -19,17 +19,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.lalosapps.firebaseauth.R
-import com.lalosapps.firebaseauth.navigation.ROUTE_LOGIN
-import com.lalosapps.firebaseauth.navigation.ROUTE_SIGNUP
 import com.lalosapps.firebaseauth.ui.theme.AppTheme
 import com.lalosapps.firebaseauth.ui.theme.spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignupScreen(navController: NavHostController) {
+fun SignupScreen(
+    onSignupClick: () -> Unit,
+    onNavigate: () -> Unit
+) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -121,9 +120,7 @@ fun SignupScreen(navController: NavHostController) {
         )
 
         Button(
-            onClick = {
-
-            },
+            onClick = onSignupClick,
             modifier = Modifier.constrainAs(refButtonSignup) {
                 top.linkTo(refPassword.bottom, spacing.large)
                 start.linkTo(parent.start, spacing.extraLarge)
@@ -131,7 +128,10 @@ fun SignupScreen(navController: NavHostController) {
                 width = Dimension.fillToConstraints
             }
         ) {
-            Text(text = stringResource(id = R.string.signup), style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = stringResource(id = R.string.signup),
+                style = MaterialTheme.typography.titleMedium
+            )
         }
 
 
@@ -143,9 +143,7 @@ fun SignupScreen(navController: NavHostController) {
                     end.linkTo(parent.end, spacing.extraLarge)
                 }
                 .clickable {
-                    navController.navigate(ROUTE_LOGIN) {
-                        popUpTo(ROUTE_SIGNUP) { inclusive = true }
-                    }
+                    onNavigate()
                 },
             text = stringResource(id = R.string.already_have_account),
             style = MaterialTheme.typography.bodyLarge,
@@ -160,7 +158,7 @@ fun SignupScreen(navController: NavHostController) {
 @Composable
 fun SignupScreenPreviewLight() {
     AppTheme {
-        SignupScreen(rememberNavController())
+        SignupScreen({}, {})
     }
 }
 
@@ -168,6 +166,6 @@ fun SignupScreenPreviewLight() {
 @Composable
 fun SignupScreenPreviewDark() {
     AppTheme {
-        SignupScreen(rememberNavController())
+        SignupScreen({}, {})
     }
 }
