@@ -5,9 +5,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseUser
 import com.lalosapps.firebaseauth.data.AuthRepository
 import com.lalosapps.firebaseauth.data.Resource
+import com.lalosapps.firebaseauth.data.utils.await
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +27,7 @@ class AuthViewModel @Inject constructor(
     private val _signupFlow = MutableStateFlow<Resource<FirebaseUser>?>(null)
     val signupFlow = _signupFlow.asStateFlow()
 
+    // This acts like a state because of the getters
     val currentUser: FirebaseUser?
         get() = repository.currentUser
 
@@ -33,8 +36,16 @@ class AuthViewModel @Inject constructor(
 
     init {
         if (currentUser != null) {
-            _loginFlow.value = Resource.Success(currentUser!!)
-            signedIn = true
+            viewModelScope.launch {
+                try {
+                    currentUser!!.reload().await()
+                    _loginFlow.value = Resource.Success(currentUser!!)
+                    signedIn = true
+                } catch (e: FirebaseAuthInvalidUserException) {
+                    _loginFlow.value = Resource.Failure(e)
+                    signedIn = false
+                }
+            }
         } else {
             signedIn = false
         }
