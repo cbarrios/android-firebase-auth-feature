@@ -40,6 +40,7 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var navigated by remember { mutableStateOf(false) }
 
     if (isSignedIn == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -140,8 +141,11 @@ fun LoginScreen(
                             end.linkTo(parent.end, spacing.extraLarge)
                         }
                         .clickable {
-                            if (loginFlow == null || loginFlow is Resource.Failure) {
-                                onNavigate(ROUTE_SIGNUP)
+                            if (!navigated) {
+                                navigated = true
+                                if (loginFlow == null || loginFlow is Resource.Failure) {
+                                    onNavigate(ROUTE_SIGNUP)
+                                }
                             }
                         },
                     text = stringResource(id = R.string.dont_have_account),

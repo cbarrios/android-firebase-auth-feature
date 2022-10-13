@@ -40,6 +40,7 @@ fun SignupScreen(
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var navigated by remember { mutableStateOf(false) }
 
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
@@ -152,8 +153,11 @@ fun SignupScreen(
                     end.linkTo(parent.end, spacing.extraLarge)
                 }
                 .clickable {
-                    if (signupFlow == null || signupFlow is Resource.Failure) {
-                        onNavigate(ROUTE_LOGIN)
+                    if (!navigated) {
+                        navigated = true
+                        if (signupFlow == null || signupFlow is Resource.Failure) {
+                            onNavigate(ROUTE_LOGIN)
+                        }
                     }
                 },
             text = stringResource(id = R.string.already_have_account),
