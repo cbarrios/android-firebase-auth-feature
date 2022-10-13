@@ -35,7 +35,8 @@ fun LoginScreen(
     isSignedIn: Boolean?,
     loginFlow: Resource<FirebaseUser>?,
     onLoginClick: (String, String) -> Unit,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    onErrorMessage: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -122,7 +123,8 @@ fun LoginScreen(
                         start.linkTo(parent.start, spacing.extraLarge)
                         end.linkTo(parent.end, spacing.extraLarge)
                         width = Dimension.fillToConstraints
-                    }
+                    },
+                    enabled = loginFlow == null || loginFlow is Resource.Failure
                 ) {
                     Text(
                         text = stringResource(id = R.string.login),
@@ -159,8 +161,11 @@ fun LoginScreen(
                     is Resource.Failure -> {
                         val context = LocalContext.current
                         LaunchedEffect(key1 = loginFlow) {
-                            Toast.makeText(context, loginFlow.exception.message, Toast.LENGTH_LONG)
-                                .show()
+                            val msg = loginFlow.exception.message
+                            if (msg != null) {
+                                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                                onErrorMessage()
+                            }
                         }
                     }
                     else -> Unit
@@ -174,7 +179,7 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreviewLight() {
     AppTheme {
-        LoginScreen(false, null, { _, _ -> }, {})
+        LoginScreen(false, null, { _, _ -> }, {}, {})
     }
 }
 
@@ -182,6 +187,6 @@ fun LoginScreenPreviewLight() {
 @Composable
 fun LoginScreenPreviewDark() {
     AppTheme {
-        LoginScreen(false, null, { _, _ -> }, {})
+        LoginScreen(false, null, { _, _ -> }, {}, {})
     }
 }

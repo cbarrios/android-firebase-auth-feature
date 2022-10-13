@@ -38,6 +38,9 @@ fun AppNavHost(
                     navController.navigate(route) {
                         popUpTo(ROUTE_LOGIN) { inclusive = true }
                     }
+                },
+                onErrorMessage = {
+                    viewModel.onLoginErrorShown()
                 }
             )
         }
@@ -49,6 +52,9 @@ fun AppNavHost(
                     navController.navigate(route) {
                         popUpTo(ROUTE_SIGNUP) { inclusive = true }
                     }
+                },
+                onErrorMessage = {
+                    viewModel.onSignupErrorShown()
                 }
             )
         }

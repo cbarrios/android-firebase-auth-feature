@@ -34,7 +34,8 @@ import com.lalosapps.firebaseauth.ui.theme.spacing
 fun SignupScreen(
     signupFlow: Resource<FirebaseUser>?,
     onSignupClick: (String, String, String) -> Unit,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    onErrorMessage: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -133,7 +134,8 @@ fun SignupScreen(
                 start.linkTo(parent.start, spacing.extraLarge)
                 end.linkTo(parent.end, spacing.extraLarge)
                 width = Dimension.fillToConstraints
-            }
+            },
+            enabled = signupFlow == null || signupFlow is Resource.Failure
         ) {
             Text(
                 text = stringResource(id = R.string.signup),
@@ -176,7 +178,11 @@ fun SignupScreen(
                 is Resource.Failure -> {
                     val context = LocalContext.current
                     LaunchedEffect(key1 = it) {
-                        Toast.makeText(context, it.exception.message, Toast.LENGTH_LONG).show()
+                        val msg = it.exception.message
+                        if (msg != null) {
+                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                            onErrorMessage()
+                        }
                     }
                 }
             }
@@ -189,7 +195,7 @@ fun SignupScreen(
 @Composable
 fun SignupScreenPreviewLight() {
     AppTheme {
-        SignupScreen(null, { _, _, _ -> }, {})
+        SignupScreen(null, { _, _, _ -> }, {}, {})
     }
 }
 
@@ -197,6 +203,6 @@ fun SignupScreenPreviewLight() {
 @Composable
 fun SignupScreenPreviewDark() {
     AppTheme {
-        SignupScreen(null, { _, _, _ -> }, {})
+        SignupScreen(null, { _, _, _ -> }, {}, {})
     }
 }

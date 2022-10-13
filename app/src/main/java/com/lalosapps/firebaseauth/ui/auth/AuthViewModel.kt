@@ -45,6 +45,7 @@ class AuthViewModel @Inject constructor(
             _loginFlow.value = Resource.Loading
             val result = repository.loginUser(email, password)
             _loginFlow.value = result
+            if (result is Resource.Success) signedIn = true
         }
     }
 
@@ -53,6 +54,7 @@ class AuthViewModel @Inject constructor(
             _signupFlow.value = Resource.Loading
             val result = repository.createUserAccount(name, email, password)
             _signupFlow.value = result
+            if (result is Resource.Success) signedIn = true
         }
     }
 
@@ -61,5 +63,13 @@ class AuthViewModel @Inject constructor(
         _loginFlow.value = null
         _signupFlow.value = null
         signedIn = false
+    }
+
+    fun onLoginErrorShown() {
+        _loginFlow.value = Resource.Failure(Exception())
+    }
+
+    fun onSignupErrorShown() {
+        _signupFlow.value = Resource.Failure(Exception())
     }
 }
