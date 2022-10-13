@@ -22,6 +22,7 @@ fun AppNavHost(
 ) {
 
     val loginFlow = viewModel.loginFlow.collectAsState().value
+    val signupFlow = viewModel.signupFlow.collectAsState().value
 
     NavHost(
         modifier = modifier,
@@ -30,6 +31,7 @@ fun AppNavHost(
     ) {
         composable(ROUTE_LOGIN) {
             LoginScreen(
+                isSignedIn = viewModel.signedIn,
                 loginFlow = loginFlow,
                 onLoginClick = viewModel::login,
                 onNavigate = { route ->
@@ -41,11 +43,10 @@ fun AppNavHost(
         }
         composable(ROUTE_SIGNUP) {
             SignupScreen(
-                onSignupClick = {
-
-                },
-                onNavigate = {
-                    navController.navigate(ROUTE_LOGIN) {
+                signupFlow = signupFlow,
+                onSignupClick = viewModel::signup,
+                onNavigate = { route ->
+                    navController.navigate(route) {
                         popUpTo(ROUTE_SIGNUP) { inclusive = true }
                     }
                 }

@@ -1,5 +1,8 @@
 package com.lalosapps.firebaseauth.ui.auth
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
@@ -25,9 +28,15 @@ class AuthViewModel @Inject constructor(
     val currentUser: FirebaseUser?
         get() = repository.currentUser
 
+    var signedIn: Boolean? by mutableStateOf(null)
+        private set
+
     init {
         if (currentUser != null) {
+            signedIn = true
             _loginFlow.value = Resource.Success(currentUser!!)
+        } else {
+            signedIn = false
         }
     }
 

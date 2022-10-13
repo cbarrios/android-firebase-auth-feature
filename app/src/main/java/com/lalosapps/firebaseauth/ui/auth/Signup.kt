@@ -2,6 +2,7 @@ package com.lalosapps.firebaseauth.ui.auth
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -19,15 +21,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.google.firebase.auth.FirebaseUser
 import com.lalosapps.firebaseauth.R
+import com.lalosapps.firebaseauth.data.Resource
+import com.lalosapps.firebaseauth.navigation.ROUTE_HOME
+import com.lalosapps.firebaseauth.navigation.ROUTE_LOGIN
 import com.lalosapps.firebaseauth.ui.theme.AppTheme
 import com.lalosapps.firebaseauth.ui.theme.spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupScreen(
-    onSignupClick: () -> Unit,
-    onNavigate: () -> Unit
+    signupFlow: Resource<FirebaseUser>?,
+    onSignupClick: (String, String, String) -> Unit,
+    onNavigate: (String) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -36,7 +43,7 @@ fun SignupScreen(
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
     ) {
-        val (refHeader, refName, refEmail, refPassword, refButtonSignup, refTextSignup) = createRefs()
+        val (refHeader, refName, refEmail, refPassword, refButtonSignup, refTextSignup, refLoader) = createRefs()
         val spacing = MaterialTheme.spacing
 
         Box(
@@ -120,7 +127,7 @@ fun SignupScreen(
         )
 
         Button(
-            onClick = onSignupClick,
+            onClick = { onSignupClick(name, email, password) },
             modifier = Modifier.constrainAs(refButtonSignup) {
                 top.linkTo(refPassword.bottom, spacing.large)
                 start.linkTo(parent.start, spacing.extraLarge)
@@ -143,13 +150,37 @@ fun SignupScreen(
                     end.linkTo(parent.end, spacing.extraLarge)
                 }
                 .clickable {
-                    onNavigate()
+                    onNavigate(ROUTE_LOGIN)
                 },
             text = stringResource(id = R.string.already_have_account),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface
         )
+
+        signupFlow?.let {
+            when (it) {
+                Resource.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.constrainAs(refLoader) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    })
+                }
+                is Resource.Success -> {
+                    LaunchedEffect(key1 = Unit) {
+                        onNavigate(ROUTE_HOME)
+                    }
+                }
+                is Resource.Failure -> {
+                    val context = LocalContext.current
+                    LaunchedEffect(key1 = it) {
+                        Toast.makeText(context, it.exception.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
 
     }
 }
@@ -158,7 +189,7 @@ fun SignupScreen(
 @Composable
 fun SignupScreenPreviewLight() {
     AppTheme {
-        SignupScreen({}, {})
+        SignupScreen(null, { _, _, _ -> }, {})
     }
 }
 
@@ -166,6 +197,6 @@ fun SignupScreenPreviewLight() {
 @Composable
 fun SignupScreenPreviewDark() {
     AppTheme {
-        SignupScreen({}, {})
+        SignupScreen(null, { _, _, _ -> }, {})
     }
 }
