@@ -3,14 +3,15 @@ package com.lalosapps.firebaseauth
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.lalosapps.firebaseauth.ui.theme.FirebaseAuthTheme
+import com.lalosapps.firebaseauth.navigation.AppNavHost
+import com.lalosapps.firebaseauth.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            FirebaseAuthTheme {
-
+            AppTheme {
+                AppNavHost()
             }
         }
     }
