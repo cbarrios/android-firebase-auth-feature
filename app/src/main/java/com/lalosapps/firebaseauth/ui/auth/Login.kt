@@ -2,6 +2,7 @@ package com.lalosapps.firebaseauth.ui.auth
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -18,15 +20,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.google.firebase.auth.FirebaseUser
 import com.lalosapps.firebaseauth.R
+import com.lalosapps.firebaseauth.data.Resource
+import com.lalosapps.firebaseauth.navigation.ROUTE_HOME
+import com.lalosapps.firebaseauth.navigation.ROUTE_SIGNUP
 import com.lalosapps.firebaseauth.ui.theme.AppTheme
 import com.lalosapps.firebaseauth.ui.theme.spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onLoginClick: () -> Unit,
-    onNavigate: () -> Unit,
+    loginFlow: Resource<FirebaseUser>?,
+    onLoginClick: (String, String) -> Unit,
+    onNavigate: (String) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -35,7 +42,7 @@ fun LoginScreen(
         modifier = Modifier.fillMaxSize()
     ) {
 
-        val (refHeader, refEmail, refPassword, refButtonLogin, refTextSignup) = createRefs()
+        val (refHeader, refEmail, refPassword, refButtonLogin, refTextSignup, refLoader) = createRefs()
         val spacing = MaterialTheme.spacing
 
         Box(
@@ -97,7 +104,7 @@ fun LoginScreen(
         )
 
         Button(
-            onClick = onLoginClick,
+            onClick = { onLoginClick(email, password) },
             modifier = Modifier.constrainAs(refButtonLogin) {
                 top.linkTo(refPassword.bottom, spacing.large)
                 start.linkTo(parent.start, spacing.extraLarge)
@@ -119,7 +126,7 @@ fun LoginScreen(
                     end.linkTo(parent.end, spacing.extraLarge)
                 }
                 .clickable {
-                    onNavigate()
+                    onNavigate(ROUTE_SIGNUP)
                 },
             text = stringResource(id = R.string.dont_have_account),
             style = MaterialTheme.typography.bodyLarge,
@@ -127,6 +134,29 @@ fun LoginScreen(
             color = MaterialTheme.colorScheme.onSurface
         )
 
+        loginFlow?.let {
+            when (it) {
+                Resource.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.constrainAs(refLoader) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    })
+                }
+                is Resource.Success -> {
+                    LaunchedEffect(key1 = Unit) {
+                        onNavigate(ROUTE_HOME)
+                    }
+                }
+                is Resource.Failure -> {
+                    val context = LocalContext.current
+                    LaunchedEffect(key1 = it) {
+                        Toast.makeText(context, it.exception.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -134,7 +164,7 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreviewLight() {
     AppTheme {
-        LoginScreen({}, {})
+        LoginScreen(null, { _, _ -> }, {})
     }
 }
 
@@ -142,6 +172,6 @@ fun LoginScreenPreviewLight() {
 @Composable
 fun LoginScreenPreviewDark() {
     AppTheme {
-        LoginScreen({}, {})
+        LoginScreen(null, { _, _ -> }, {})
     }
 }

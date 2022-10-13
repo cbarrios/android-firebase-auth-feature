@@ -1,6 +1,7 @@
 package com.lalosapps.firebaseauth.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -19,6 +20,9 @@ fun AppNavHost(
     startDestination: String = ROUTE_LOGIN,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+
+    val loginFlow = viewModel.loginFlow.collectAsState().value
+
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -26,11 +30,10 @@ fun AppNavHost(
     ) {
         composable(ROUTE_LOGIN) {
             LoginScreen(
-                onLoginClick = {
-
-                },
-                onNavigate = {
-                    navController.navigate(ROUTE_SIGNUP) {
+                loginFlow = loginFlow,
+                onLoginClick = viewModel::login,
+                onNavigate = { route ->
+                    navController.navigate(route) {
                         popUpTo(ROUTE_LOGIN) { inclusive = true }
                     }
                 }
@@ -49,11 +52,7 @@ fun AppNavHost(
             )
         }
         composable(ROUTE_HOME) {
-            HomeScreen(
-                onLogoutClick = {
-
-                }
-            )
+            HomeScreen(onLogoutClick = viewModel::logout)
         }
     }
 }

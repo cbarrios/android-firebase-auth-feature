@@ -41,9 +41,9 @@ class AuthViewModel @Inject constructor(
 
     fun signup(name: String, email: String, password: String) {
         viewModelScope.launch {
-            _loginFlow.value = Resource.Loading
+            _signupFlow.value = Resource.Loading
             val result = repository.createUserAccount(name, email, password)
-            _loginFlow.value = result
+            _signupFlow.value = result
         }
     }
 
