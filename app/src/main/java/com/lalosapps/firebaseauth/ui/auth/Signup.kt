@@ -152,7 +152,9 @@ fun SignupScreen(
                     end.linkTo(parent.end, spacing.extraLarge)
                 }
                 .clickable {
-                    onNavigate(ROUTE_LOGIN)
+                    if (signupFlow == null || signupFlow is Resource.Failure) {
+                        onNavigate(ROUTE_LOGIN)
+                    }
                 },
             text = stringResource(id = R.string.already_have_account),
             style = MaterialTheme.typography.bodyLarge,

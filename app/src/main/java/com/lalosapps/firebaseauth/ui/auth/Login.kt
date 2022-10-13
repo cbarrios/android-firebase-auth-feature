@@ -140,7 +140,9 @@ fun LoginScreen(
                             end.linkTo(parent.end, spacing.extraLarge)
                         }
                         .clickable {
-                            onNavigate(ROUTE_SIGNUP)
+                            if (loginFlow == null || loginFlow is Resource.Failure) {
+                                onNavigate(ROUTE_SIGNUP)
+                            }
                         },
                     text = stringResource(id = R.string.dont_have_account),
                     style = MaterialTheme.typography.bodyLarge,
